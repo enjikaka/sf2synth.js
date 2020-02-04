@@ -1,6 +1,6 @@
-import SynthesizerNote from './sound_font_synth_note';
-import Parser from './sf2';
-import Reverb from '@logue/reverb/src/reverb';
+import SynthesizerNote from './sound_font_synth_note.js';
+import Parser from './sf2.js';
+import Reverb from 'https://unpkg.com/@logue/reverb@0.2.2/src/reverb.js';
 /**
  * Synthesizer Class
  * @private
@@ -126,13 +126,6 @@ export class Synthesizer {
       // フィルタを定義
       this.filter[i] = this.ctx.createBiquadFilter();
     }
-
-    this.observer = new IntersectionObserver((entries, object) => {
-      entries.forEach((entry, i) => {
-        // 交差していない
-        entry.target.dataset.isIntersecting = entry.isIntersecting;
-      });
-    }, {});
   }
 
   /**
@@ -214,10 +207,9 @@ export class Synthesizer {
     /*
     if (this.element) {
       this.element.querySelector('.header div:before').innerText = mode + ' Mode';
+      this.element.dataset.mode = mode;
     }
     */
-
-    this.element.dataset.mode = mode;
   }
 
   /**

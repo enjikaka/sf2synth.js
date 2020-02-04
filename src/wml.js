@@ -99,7 +99,7 @@ export class WebMidiLink {
     loading.className = 'alert alert-warning';
     loadingText.innerText = 'Now Loading...';
 
-    const promise = new Promise(resolve =>{ 
+    const promise = new Promise(resolve =>{
       if (this.option.cache && window.caches) {
         // キャッシュが利用可能な場合
         loadingText.className = 'ml-1';

@@ -3,20 +3,11 @@
   "version": "0.3.4",
   "description": "SoundFont2 Synthesizer",
   "scripts": {
-    "watch": "webpack --mode development --watch --color --progress",
-    "dev": "webpack --mode development",
-    "prod": "webpack --mode production --env.production",
-    "start": "webpack-dev-server --color --mode development",
-    "fix": "eslint --fix ./src"
-  },
-  "main": "bin/sf2.synth.min.js",
-  "bin": {
-    "sf2synth": "bin/sf2.synth.min.js",
-    "sf2parser": "bin/sf2.parser.min.js"
+    "start": "http-server ./src -p 8080"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/logue/sf2synth.js.git"
+    "url": "git+https://github.com/enjikaka/sf2synth.js.git"
   },
   "keywords": [
     "midi",
@@ -31,45 +22,32 @@
     "gs"
   ],
   "author": {
-    "name": "imaya / GREE Inc.",
-    "url": "https://github.com/gree"
+    "name": "Jeremy Karlsson",
+    "url": "https://github.com/enjikaka"
   },
   "contributors": [
+    {
+      "name": "imaya / GREE Inc.",
+      "url": "https://github.com/gree"
+    },
     {
       "name": "Logue",
       "email": "logue@hotmail.co.jp",
       "url": "https://logue.dev"
+    },
+    {
+      "name": "Jeremy Karlsson",
+      "email": "karlsson@jeremy.se",
+      "url": "https://github.com/enjikaka"
     }
   ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/logue/sf2synth.js/issues"
+    "url": "https://github.com/enjikaka/sf2synth.js/issues"
   },
-  "homepage": "https://github.com/logue/sf2synth.js",
+  "homepage": "https://github.com/enjikaka/sf2synth.js",
   "devDependencies": {
-    "@babel/cli": "^7.7.7",
-    "@babel/core": "^7.7.7",
-    "@babel/polyfill": "^7.7.0",
-    "@babel/preset-env": "^7.7.7",
-    "babel-loader": "^8.0.6",
-    "copy-webpack-plugin": "^5.1.1",
-    "core-js": "^3.6.1",
-    "css-loader": "^3.4.0",
-    "eslint": "^6.8.0",
-    "eslint-config-google": "^0.13.0",
-    "fs": "0.0.1-security",
-    "mini-css-extract-plugin": "^0.9.0",
-    "node-sass": "^4.13.0",
-    "optimize-css-assets-webpack-plugin": "^5.0.3",
-    "sass-loader": "^8.0.0",
-    "style-loader": "^1.1.2",
-    "terser-webpack-plugin": "^2.3.1",
-    "webpack": "^4.41.5",
-    "webpack-cli": "^3.3.10",
-    "webpack-dev-server": "^3.10.1"
+    "http-server": "^0.12.1"
   },
-  "dependencies": {
-    "@logue/reverb": "^0.2.2",
-    "bootstrap": "^4.4.1"
-  }
+  "dependencies": {}
 }

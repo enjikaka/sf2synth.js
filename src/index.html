@@ -1,0 +1,45 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+<body>
+  <button>60</button>
+  <button>61</button>
+  <button>62</button>
+
+  <script type="module">
+  import SoundFont from './soundFont.js';
+
+  const sf = new SoundFont();
+
+  sf.loadSoundFontFromURL('./mario.sf2')
+    .then(() =>{
+      const { banks } = sf;
+
+      console.log({ banks });
+
+      sf.bank = banks[0].bankIndex;
+
+      const { programs } = sf;
+      const program = programs[2];
+
+      console.log({ programs });
+
+      sf.program = program.programIndex;
+
+      console.log('Using', program);
+    });
+
+  [...document.querySelectorAll('button')].forEach(button => {
+    const midiNum = parseInt(button.textContent, 10);
+
+    button.addEventListener('mousedown', () => sf.noteOn(midiNum), false);
+    button.addEventListener('mouseup', () => sf.noteOff(midiNum), false);
+  });
+
+  </script>
+</body>
+</html>
