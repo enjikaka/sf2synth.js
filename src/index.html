@@ -4,29 +4,37 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>Document</title>
+  <style>
+  .hidden {
+    opacity: 0
+  }
+  </style>
 </head>
 <body>
-  <input type="file">
+  <fieldset>
+    <legend>Open SF2 file</legend>
+    <input type="file">
+  </fieldset>
   <output></output>
 
-  <br><hr><br>
+  <div id="controls" class="hidden">
+    <br><hr><br>
 
-  <fieldset>
-    <legend>Bank</legend>
-    <select name="bank" id="banks"></select>
-  </fieldset>
+    <fieldset>
+      <legend>Bank</legend>
+      <select name="bank" id="banks"></select>
+    </fieldset>
 
-  <fieldset>
-    <legend>Program</legend>
-    <select name="program" id="programs"></select>
-  </fieldset>
+    <fieldset>
+      <legend>Program</legend>
+      <select name="program" id="programs"></select>
+    </fieldset>
 
-  <br><hr><br>
+    <br><hr><br>
 
-  <div class="keys">
-    <button>60</button>
-    <button>61</button>
-    <button>62</button>
+    <div id="keys">
+
+    </div>
   </div>
 
   <script type="module">
@@ -38,6 +46,10 @@
   const sf = new SoundFont();
 
   const stringToElements = str => document.createRange().createContextualFragment(str);
+
+  const buttons = stringToElements([...new Array(60)].map((_, i) => i + 30).map(midiNum => `<button>${midiNum}</button>`).join(''));
+
+  window.keys.appendChild(buttons);
 
   function selectFirstAvailableProgram () {
     const { banks } = sf;
@@ -58,6 +70,7 @@
     sf.program = program.id;
 
     statusOutput.textContent = 'Using ' + program.name;
+    window.controls.classList.remove('hidden');
   }
 
   [...document.querySelectorAll('button')].forEach(button => {
@@ -65,6 +78,8 @@
 
     button.addEventListener('mousedown', () => sf.noteOn(midiNum), false);
     button.addEventListener('mouseup', () => sf.noteOff(midiNum), false);
+    button.addEventListener('mouseover', () => sf.noteOff(midiNum), false);
+    button.addEventListener('mouseout', () => sf.noteOff(midiNum), false);
   });
 
   window.banks.addEventListener('change', e => {
