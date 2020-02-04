@@ -6,32 +6,59 @@
   <title>Document</title>
 </head>
 <body>
-  <button>60</button>
-  <button>61</button>
-  <button>62</button>
+  <input type="file">
+  <output></output>
+
+  <br><hr><br>
+
+  <fieldset>
+    <legend>Bank</legend>
+    <select name="bank" id="banks"></select>
+  </fieldset>
+
+  <fieldset>
+    <legend>Program</legend>
+    <select name="program" id="programs"></select>
+  </fieldset>
+
+  <br><hr><br>
+
+  <div class="keys">
+    <button>60</button>
+    <button>61</button>
+    <button>62</button>
+  </div>
 
   <script type="module">
   import SoundFont from './soundFont.js';
 
+  const statusOutput = document.querySelector('output');
+  const fileInput = document.querySelector('input');
+
   const sf = new SoundFont();
 
-  sf.loadSoundFontFromURL('./mario.sf2')
-    .then(() =>{
-      const { banks } = sf;
+  const stringToElements = str => document.createRange().createContextualFragment(str);
 
-      console.log({ banks });
+  function selectFirstAvailableProgram () {
+    const { banks } = sf;
 
-      sf.bank = banks[0].bankIndex;
+    const banksFragment = stringToElements(banks.map(bank => `<option value="${bank.id}">${bank.name}</option>`).join());
 
-      const { programs } = sf;
-      const program = programs[2];
+    window.banks.appendChild(banksFragment);
 
-      console.log({ programs });
+    sf.bank = banks[0].id;
 
-      sf.program = program.programIndex;
+    const { programs } = sf;
+    const program = programs[2];
 
-      console.log('Using', program);
-    });
+    const programsFragment = stringToElements(programs.map(program => `<option value="${program.id}">${program.name}</option>`).join());
+
+    window.programs.appendChild(programsFragment);
+
+    sf.program = program.id;
+
+    statusOutput.textContent = 'Using ' + program.name;
+  }
 
   [...document.querySelectorAll('button')].forEach(button => {
     const midiNum = parseInt(button.textContent, 10);
@@ -39,6 +66,26 @@
     button.addEventListener('mousedown', () => sf.noteOn(midiNum), false);
     button.addEventListener('mouseup', () => sf.noteOff(midiNum), false);
   });
+
+  window.banks.addEventListener('change', e => {
+    sf.bank = e.target.value;
+  })
+
+  window.programs.addEventListener('change', e => {
+    sf.program = e.target.value;
+  })
+
+  fileInput.addEventListener('change', async e => {
+    const file = e.target.files[0];
+
+    statusOutput.textContent = 'Loading soundfont ' + file.name;
+
+    await sf.loadSoundFontFromFile(file);
+
+    statusOutput.textContent = 'Choosing first available program...';
+
+    selectFirstAvailableProgram();
+  })
 
   </script>
 </body>

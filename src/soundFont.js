@@ -7,7 +7,7 @@ function readFileAsArrayBuffer (file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
 
-    reader.onload = () => resolve(e.target.result);
+    reader.onload = () => resolve(reader.result);
     reader.onerror = error => reject(error);
 
     reader.readAsArrayBuffer(file);
@@ -55,7 +55,7 @@ export default class SoundFont {
    * @param {File} file
    */
   async loadSoundFontFromFile (file) {
-    const arrayBuffer = await readFileAsArrayBuffer(url);
+    const arrayBuffer = await readFileAsArrayBuffer(file);
 
     this.bootSynth(arrayBuffer);
   }
@@ -77,9 +77,9 @@ export default class SoundFont {
   }
 
   get banks () {
-    return Object.keys(this.synth.programSet).map(bankIndex => ({
-      bankIndex,
-      bankName:  ('000' + parseInt(bankIndex, 10)).slice(-3)
+    return Object.keys(this.synth.programSet).map(id => ({
+      id,
+      name:  ('000' + parseInt(id, 10)).slice(-3)
     }));
   }
 
@@ -92,9 +92,9 @@ export default class SoundFont {
   get programs () {
     const { programSet } = this.synth;
 
-    return Object.keys(programSet[this._bankIndex]).map(programIndex => ({
-      programIndex,
-      programName: ('000' + (parseInt(programIndex) + 1)).slice(-3) + ':' + programSet[this._bankIndex][programIndex]
+    return Object.keys(programSet[this._bankIndex]).map(id => ({
+      id,
+      name: ('000' + (parseInt(id) + 1)).slice(-3) + ':' + programSet[this._bankIndex][id]
     }));
   }
 
