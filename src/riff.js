@@ -2,13 +2,12 @@
  * Riff Parser class
  * @private
  */
-export default class Riff {
+export class Riff {
   /**
-   * @param {ByteArray} input input buffer.
+   * @param {Uint8Array} input input buffer.
    * @param {Object=} optParams option parameters.
    */
   constructor (input, optParams = {}) {
-    /** @type {ByteArray} */
     this.input = input;
     /** @type {number} */
     this.ip = optParams.index || 0;
@@ -26,8 +25,6 @@ export default class Riff {
       optParams.bigEndian !== void 0 ? optParams.bigEndian : false;
   }
 
-  /**
-   */
   parse () {
     /** @type {number} */
     const length = this.length + this.offset;
@@ -39,10 +36,7 @@ export default class Riff {
     }
   }
 
-  /**
-   */
   parseChunk () {
-    /** @type {ByteArray} */
     const input = this.input;
     /** @type {number} */
     let ip = this.ip;
@@ -97,7 +91,7 @@ export default class Riff {
  * Riff Chunk Structure
  * @interface
  */
-class RiffChunk {
+export class RiffChunk {
   /**
    * @param {string} type
    * @param {number} size

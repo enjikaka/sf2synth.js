@@ -4,7 +4,7 @@
   "description": "SoundFont2 Player",
   "type": "module",
   "scripts": {
-    "start": "http-server ./src -p 8080",
+    "start": "http-server ./ -p 8080",
     "build": "npx @pika/pack"
   },
   "@pika/pack": {

@@ -236,8 +236,6 @@ export class Synthesizer {
       this.harmonicContent(i, 64);
       this.cutOffFrequency(i, 64);
       this.reverbDepth(i, 40);
-      this.updateBankSelect(i);
-      this.updateProgramSelect(i);
     }
 
     this.setPercussionPart(9, true);
@@ -247,13 +245,6 @@ export class Synthesizer {
     }
 
     this.gainMaster.connect(this.ctx.destination);
-
-    /*
-    if (this.element) {
-      this.element.querySelector('.header div:before').innerText = mode + ' Mode';
-      this.element.dataset.mode = mode;
-    }
-    */
   }
 
   /**
@@ -574,8 +565,6 @@ export class Synthesizer {
 
     note.noteOn();
     this.currentNoteOn[channel].push(note);
-
-    this.updateSynthElement(channel, key, velocity);
   }
 
   /**
@@ -608,7 +597,6 @@ export class Synthesizer {
         }
       }
     }
-    this.updateSynthElement(channel, key, 0);
   }
 
   /**
@@ -636,17 +624,6 @@ export class Synthesizer {
           --i;
           --il;
         }
-      }
-    }
-
-    if (this.element) {
-      /** @type {HTMLDivElement} */
-      const channelElement = this.element.querySelector('.instrument > .channel:nth-child(' + (channel + 1) + ')');
-
-      if (this.channelHold[channel]) {
-        channelElement.classList.add('hold');
-      } else {
-        channelElement.classList.remove('hold');
       }
     }
   }
@@ -707,9 +684,6 @@ export class Synthesizer {
     this.channelInstrument[channel] = instrument;
 
     this.bankChange(channel, this.channelBank[channel]);
-    if (this.element) {
-      this.element.querySelector('.instrument > .channel:nth-child(' + (channel + 1) + ') .program > select').value = instrument;
-    }
   }
 
   /**
@@ -730,13 +704,6 @@ export class Synthesizer {
         this.channelBank[channel] = 0;
       }
     }
-
-    // TODO: 厳密にはMIDI音源はプログラムチェンジがあったときにバンク・セレクトが反映される。
-    this.updateProgramSelect(channel);
-
-    if (this.element) {
-      this.element.querySelector('.instrument > .channel:nth-child(' + (channel + 1) + ') > .bank > select').value = bank;
-    }
   }
 
   /**
@@ -744,10 +711,6 @@ export class Synthesizer {
    * @param {number} volume 音量(0-127).
    */
   volumeChange (channel, volume) {
-    if (this.element) {
-      this.element.querySelector('.instrument > .channel:nth-child(' + (channel + 1) + ') > .volume var').innerText = volume;
-    }
-
     this.channelVolume[channel] = volume;
   }
 
@@ -775,10 +738,6 @@ export class Synthesizer {
    * @param {number} panpot panpot(0-127).
    */
   panpotChange (channel, panpot) {
-    if (this.element) {
-      this.element.querySelector('.instrument > .channel:nth-child(' + (channel + 1) + ') > .panpot > meter').value = panpot;
-    }
-
     this.channelPanpot[channel] = panpot;
   }
 
@@ -799,10 +758,6 @@ export class Synthesizer {
     /** @type {number} */
     const calculated = bend - 8192;
 
-    if (this.element) {
-      this.element.querySelector('.instrument > .channel:nth-child(' + (channel + 1) + ') > .pitchBend > meter').value = calculated;
-    }
-
     for (i = 0, il = currentNoteOn.length; i < il; ++i) {
       currentNoteOn[i].updatePitchBend(calculated);
     }
@@ -815,9 +770,6 @@ export class Synthesizer {
    * @param {number} sensitivity
    */
   pitchBendSensitivity (channel, sensitivity) {
-    if (this.element) {
-      document.querySelector('.instrument > .channel:nth-child(' + (channel + 1) + ') > .pitchBendSensitivity > var').innerText = sensitivity;
-    }
     this.channelPitchBendSensitivity[channel] = sensitivity;
   }
 

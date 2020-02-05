@@ -1,15 +1,15 @@
-import Riff from './riff.js';
+/* eslint-disable no-bitwise */
+import * as RiffHelper from './riff.js';
 
 /**
  * SoundFont Parser Class
  */
 export class Parser {
   /**
-   * @param {ByteArray} input
+   * @param {Uint8Array} input
    * @param {Object=} optParams
    */
   constructor (input, optParams = {}) {
-    /** @type {ByteArray} */
     this.input = input;
     /** @type {(Object|undefined)} */
     this.parserOption = optParams.parserOption || {};
@@ -17,28 +17,29 @@ export class Parser {
     this.sampleRate = optParams.sampleRate || 22050; // よくわからんが、OSで指定されているサンプルレートを入れないと音が切れ切れになる。
 
     /** @type {Array.<Object>} */
-    this.presetHeader;
+    this.presetHeader = [];
     /** @type {Array.<Object>} */
-    this.presetZone;
+    this.presetZone = [];
     /** @type {Array.<Object>} */
-    this.presetZoneModulator;
+    this.presetZoneModulator = [];
     /** @type {Array.<Object>} */
-    this.presetZoneGenerator;
+    this.presetZoneGenerator = [];
     /** @type {Array.<Object>} */
-    this.instrument;
+    this.instrument = [];
     /** @type {Array.<Object>} */
-    this.instrumentZone;
+    this.instrumentZone = [];
     /** @type {Array.<Object>} */
-    this.instrumentZoneModulator;
+    this.instrumentZoneModulator = [];
     /** @type {Array.<Object>} */
-    this.instrumentZoneGenerator;
+    this.instrumentZoneGenerator = [];
     /** @type {Array.<Object>} */
-    this.sampleHeader;
+    this.sampleHeader = [];
 
     /**
      * @type {Array.<string>}
      * @const
      */
+    // eslint-disable-next-line no-sparse-arrays
     this.GeneratorEnumeratorTable = [
       'startAddrsOffset',
       'endAddrsOffset',
@@ -96,10 +97,8 @@ export class Parser {
     ];
   }
 
-  /** @export */
   parse () {
-    /** @type {Riff} */
-    const parser = new Riff(this.input, this.parserOption);
+    const parser = new RiffHelper.Riff(this.input, this.parserOption);
 
     // parse RIFF chunk
     parser.parse();
@@ -107,7 +106,7 @@ export class Parser {
       throw new Error('wrong chunk length');
     }
 
-    /** @type {?RiffChunk} */
+    /** @type {?RiffHelper.RiffChunk} */
     const chunk = parser.getChunk(0);
 
     if (chunk === null) {
@@ -120,10 +119,10 @@ export class Parser {
   }
 
   /**
-   * @param {RiffChunk} chunk
+   * @param {RiffHelper.RiffChunk} chunk
+   * @returns {void}
    */
   parseRiffChunk (chunk) {
-    /** @type {ByteArray} */
     const data = this.input;
     /** @type {number} */
     let ip = chunk.offset;
@@ -142,29 +141,29 @@ export class Parser {
     }
 
     // read structure
-    /** @type {Riff} */
-    const parser = new Riff(data, { 'index': ip, 'length': chunk.size - 4 });
+    const parser = new RiffHelper.Riff(data, { 'index': ip, 'length': chunk.size - 4 });
 
     parser.parse();
+
     if (parser.getNumberOfChunks() !== 3) {
       throw new Error('invalid sfbk structure');
     }
 
     // INFO-list
-    this.parseInfoList(/** @type {!RiffChunk} */(parser.getChunk(0)));
+    this.parseInfoList(parser.getChunk(0));
 
     // sdta-list
-    this.parseSdtaList(/** @type {!RiffChunk} */(parser.getChunk(1)));
+    this.parseSdtaList(parser.getChunk(1));
 
     // pdta-list
-    this.parsePdtaList(/** @type {!RiffChunk} */(parser.getChunk(2)));
+    this.parsePdtaList(parser.getChunk(2));
   }
 
   /**
-   * @param {RiffChunk} chunk
+   * @param {RiffHelper.RiffChunk} chunk
+   * @returns {any}
    */
   parseInfoList (chunk) {
-    /** @type {ByteArray} */
     const data = this.input;
     /** @type {number} */
     let ip = chunk.offset;
@@ -183,17 +182,16 @@ export class Parser {
     }
 
     // read structure
-    /** @type {Riff} */
-    const parser = new Riff(data, { 'index': ip, 'length': chunk.size - 4 });
+    const parser = new RiffHelper.Riff(data, { 'index': ip, 'length': chunk.size - 4 });
 
     parser.parse();
   }
 
   /**
-   * @param {RiffChunk} chunk
+   * @param {RiffHelper.RiffChunk} chunk
+   * @returns {void}
    */
   parseSdtaList (chunk) {
-    /** @type {ByteArray} */
     const data = this.input;
     /** @type {number} */
     let ip = chunk.offset;
@@ -212,8 +210,7 @@ export class Parser {
     }
 
     // read structure
-    /** @type {Riff} */
-    const parser = new Riff(data, { 'index': ip, 'length': chunk.size - 4 });
+    const parser = new RiffHelper.Riff(data, { 'index': ip, 'length': chunk.size - 4 });
 
     parser.parse();
     if (parser.chunkList.length !== 1) {
@@ -225,10 +222,10 @@ export class Parser {
   }
 
   /**
-   * @param {RiffChunk} chunk
+   * @param {RiffHelper.RiffChunk} chunk
+   * @returns {void}
    */
   parsePdtaList (chunk) {
-    /** @type {ByteArray} */
     const data = this.input;
     /** @type {number} */
     let ip = chunk.offset;
@@ -247,8 +244,7 @@ export class Parser {
     }
 
     // read structure
-    /** @type {Riff} */
-    const parser = new Riff(data, { 'index': ip, 'length': chunk.size - 4 });
+    const parser = new RiffHelper.Riff(data, { 'index': ip, 'length': chunk.size - 4 });
 
     parser.parse();
 
@@ -257,27 +253,30 @@ export class Parser {
       throw new Error('invalid pdta chunk');
     }
 
-    this.parsePhdr(/** @type {RiffChunk} */(parser.getChunk(0)));
-    this.parsePbag(/** @type {RiffChunk} */(parser.getChunk(1)));
-    this.parsePmod(/** @type {RiffChunk} */(parser.getChunk(2)));
-    this.parsePgen(/** @type {RiffChunk} */(parser.getChunk(3)));
-    this.parseInst(/** @type {RiffChunk} */(parser.getChunk(4)));
-    this.parseIbag(/** @type {RiffChunk} */(parser.getChunk(5)));
-    this.parseImod(/** @type {RiffChunk} */(parser.getChunk(6)));
-    this.parseIgen(/** @type {RiffChunk} */(parser.getChunk(7)));
-    this.parseShdr(/** @type {RiffChunk} */(parser.getChunk(8)));
+    this.parsePhdr(parser.getChunk(0));
+    this.parsePbag(parser.getChunk(1));
+    this.parsePmod(parser.getChunk(2));
+    this.parsePgen(parser.getChunk(3));
+    this.parseInst(parser.getChunk(4));
+    this.parseIbag(parser.getChunk(5));
+    this.parseImod(parser.getChunk(6));
+    this.parseIgen(parser.getChunk(7));
+    this.parseShdr(parser.getChunk(8));
   }
 
   /**
-   * @param {RiffChunk} chunk
+   * @param {RiffHelper.RiffChunk} chunk
+   * @returns {void}
    */
   parsePhdr (chunk) {
-    /** @type {ByteArray} */
     const data = this.input;
     /** @type {number} */
     let ip = chunk.offset;
-    /** @type {Array.<Object>} */
-    const presetHeader = this.presetHeader = [];
+
+    this.presetHeader = [];
+
+    const { presetHeader } = this;
+
     /** @type {number} */
     const size = chunk.offset + chunk.size;
 
@@ -300,16 +299,18 @@ export class Parser {
   }
 
   /**
-   * @param {RiffChunk} chunk
+   * @param {RiffHelper.RiffChunk} chunk
+   * @returns {void}
    */
   parsePbag (chunk) {
-    /** @type {ByteArray} */
     const data = this.input;
     /** @type {number} */
     let ip = chunk.offset;
-    /** @type {Array.<Object>} */
-    const presetZone = this.presetZone = [];
-    /** @type {number} */
+
+    this.presetZone = [];
+
+    const { presetZone } = this;
+
     const size = chunk.offset + chunk.size;
 
     // check parse target
@@ -326,7 +327,8 @@ export class Parser {
   }
 
   /**
-   * @param {RiffChunk} chunk
+   * @param {RiffHelper.RiffChunk} chunk
+   * @returns {void}
    */
   parsePmod (chunk) {
     // check parse target
@@ -338,7 +340,8 @@ export class Parser {
   }
 
   /**
-   * @param {RiffChunk} chunk
+   * @param {RiffHelper.RiffChunk} chunk
+   * @returns {void}
    */
   parsePgen (chunk) {
     // check parse target
@@ -349,16 +352,17 @@ export class Parser {
   }
 
   /**
-   * @param {RiffChunk} chunk
+   * @param {RiffHelper.RiffChunk} chunk
+   * @returns {void}
    */
   parseInst (chunk) {
-    /** @type {ByteArray} */
     const data = this.input;
-    /** @type {number} */
+
     let ip = chunk.offset;
-    /** @type {Array.<Object>} */
-    const instrument = this.instrument = [];
-    /** @type {number} */
+
+    this.instrument = [];
+    const { instrument } = this;
+
     const size = chunk.offset + chunk.size;
 
     // check parse target
@@ -375,16 +379,15 @@ export class Parser {
   }
 
   /**
-   * @param {RiffChunk} chunk
+   * @param {RiffHelper.RiffChunk} chunk
+   * @returns {void}
    */
   parseIbag (chunk) {
-    /** @type {ByteArray} */
     const data = this.input;
-    /** @type {number} */
     let ip = chunk.offset;
-    /** @type {Array.<Object>} */
-    const instrumentZone = this.instrumentZone = [];
-    /** @type {number} */
+
+    this.instrumentZone = [];
+    const { instrumentZone } = this;
     const size = chunk.offset + chunk.size;
 
     // check parse target
@@ -401,7 +404,8 @@ export class Parser {
   }
 
   /**
-   * @param {RiffChunk} chunk
+   * @param {RiffHelper.RiffChunk} chunk
+   * @returns {void}
    */
   parseImod (chunk) {
     // check parse target
@@ -413,7 +417,8 @@ export class Parser {
   }
 
   /**
-   * @param {RiffChunk} chunk
+   * @param {RiffHelper.RiffChunk} chunk
+   * @returns {void}
    */
   parseIgen (chunk) {
     // check parse target
@@ -425,19 +430,22 @@ export class Parser {
   }
 
   /**
-   * @param {RiffChunk} chunk
+   * @param {RiffHelper.RiffChunk} chunk
+   * @returns {void}
    */
   parseShdr (chunk) {
-    /** @type {ByteArray} */
     const data = this.input;
     /** @type {number} */
     let ip = chunk.offset;
-    /** @type {Array.<Object>} */
-    const samples = this.sample = [];
-    /** @type {Array.<Object>} */
-    const sampleHeader = this.sampleHeader = [];
-    /** @type {number} */
+
+    this.sample = [];
+    const { sample: samples } = this;
+
+    this.sampleHeader = [];
+    const { sampleHeader } = this;
+
     const size = chunk.offset + chunk.size;
+
     /** @type {string} */
     let sampleName;
     /** @type {number} */
@@ -521,7 +529,7 @@ export class Parser {
   }
 
   /**
-   * @param {Array} sample
+   * @param {Int16Array} sample
    * @param {number} sampleRate
    * @return {object}
    */
@@ -538,8 +546,9 @@ export class Parser {
     let multiply = 1;
 
     // buffer
-    while (sampleRate < (this.sampleRate)) { // AudioContextのサンプルレートに変更
+    while (sampleRate < (this.sampleRate)) {
       newSample = new Int16Array(sample.length * 2);
+      // eslint-disable-next-line no-multi-assign
       for (i = j = 0, il = sample.length; i < il; ++i) {
         newSample[j++] = sample[i];
         newSample[j++] = sample[i];
@@ -556,11 +565,10 @@ export class Parser {
   }
 
   /**
-   * @param {RiffChunk} chunk
+   * @param {RiffHelper.RiffChunk} chunk
    * @return {Array.<Object>}
    */
   parseModulator (chunk) {
-    /** @type {ByteArray} */
     const data = this.input;
     /** @type {number} */
     let ip = chunk.offset;
@@ -581,7 +589,7 @@ export class Parser {
       // Dest Oper
       code = data[ip++] | (data[ip++] << 8);
       key = this.GeneratorEnumeratorTable[code];
-      if (key === void 0) {
+      if (key === undefined) {
         // Amount
         output.push({
           type: key,
@@ -634,11 +642,10 @@ export class Parser {
   }
 
   /**
-   * @param {RiffChunk} chunk
+   * @param {RiffHelper.RiffChunk} chunk
    * @return {Array.<Object>}
    */
   parseGenerator (chunk) {
-    /** @type {ByteArray} */
     const data = this.input;
     /** @type {number} */
     let ip = chunk.offset;
@@ -654,7 +661,7 @@ export class Parser {
     while (ip < size) {
       code = data[ip++] | (data[ip++] << 8);
       key = this.GeneratorEnumeratorTable[code];
-      if (key === void 0) {
+      if (key === undefined) {
         output.push({
           type: key,
           value: {
@@ -804,9 +811,9 @@ export class Parser {
         });
 
         instrument =
-          presetGenerator.generator.instrument !== void 0 ?
+          presetGenerator.generator.instrument !== undefined ?
             presetGenerator.generator.instrument.amount :
-            presetModulator.modulator.instrument !== void 0 ?
+            presetModulator.modulator.instrument !== undefined ?
               presetModulator.modulator.instrument.amount :
               null;
       }
