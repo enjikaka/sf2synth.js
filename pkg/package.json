@@ -1,29 +1,14 @@
 {
   "name": "sf2-player",
-  "version": "0.0.1",
   "description": "SoundFont2 Player",
-  "type": "module",
-  "scripts": {
-    "start": "http-server ./src -p 8080",
-    "build": "npx @pika/pack"
-  },
-  "@pika/pack": {
-    "pipeline": [
-      [
-        "@pika/plugin-standard-pkg"
-      ],
-      [
-        "@pika/plugin-build-web"
-      ],
-      [
-        "@pika/plugin-bundle-web"
-      ]
-    ]
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/enjikaka/sf2-player.git"
-  },
+  "version": "0.0.1",
+  "license": "MIT",
+  "files": [
+    "dist-*/",
+    "bin/"
+  ],
+  "pika": true,
+  "sideEffects": false,
   "keywords": [
     "midi",
     "WebMidiLink",
@@ -36,9 +21,9 @@
     "xg",
     "gs"
   ],
-  "author": {
-    "name": "Jeremy Karlsson",
-    "url": "https://github.com/enjikaka"
+  "homepage": "https://github.com/enjikaka/sf2-player",
+  "bugs": {
+    "url": "https://github.com/enjikaka/sf2-player/issues"
   },
   "contributors": [
     {
@@ -56,11 +41,13 @@
       "url": "https://github.com/enjikaka"
     }
   ],
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/enjikaka/sf2-player/issues"
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/enjikaka/sf2-player.git"
   },
-  "homepage": "https://github.com/enjikaka/sf2-player",
+  "dependencies": {
+    "@logue/reverb": "^0.2.2"
+  },
   "devDependencies": {
     "@pika/plugin-build-web": "^0.8.1",
     "@pika/plugin-bundle-web": "^0.8.1",
@@ -69,7 +56,7 @@
     "eslint-config-tidal": "^1.2.0",
     "http-server": "^0.12.1"
   },
-  "dependencies": {
-    "@logue/reverb": "^0.2.2"
-  }
+  "esnext": "dist-src/index.js",
+  "module": "dist-web/index.js",
+  "browser": "dist-web/index.bundled.js"
 }

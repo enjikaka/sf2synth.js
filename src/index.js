@@ -2,12 +2,15 @@ import Synthesizer from './sound_font_synth.js';
 
 /**
  * @param {File} file
+ * @returns {Promise<ArrayBuffer>}
  */
 function readFileAsArrayBuffer (file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
 
-    reader.onload = () => resolve(reader.result);
+    reader.onload = () => reader.result instanceof ArrayBuffer ?
+      resolve(reader.result) :
+      reject(new TypeError('File reader did not yield ArrayBuffer.'));
     reader.onerror = error => reject(error);
 
     reader.readAsArrayBuffer(file);
@@ -15,7 +18,8 @@ function readFileAsArrayBuffer (file) {
 }
 
 /**
- * @param {string} URL
+ * @param {string} url
+ * @returns {Promise<ArrayBuffer>}
  */
 async function fetchResourceAsArrayBuffer (url) {
   const response = await fetch(url);
@@ -29,6 +33,12 @@ async function fetchResourceAsArrayBuffer (url) {
   return arrayBuffer;
 }
 
+/**
+ * Wait for passed in variabe to be defined.
+ *
+ * @param {any} ref
+ * @returns {Promise<void>}
+ */
 const waitForReference = ref => new Promise(resolve => {
   const iid = setInterval(() => {
     if (ref !== undefined) {
@@ -51,8 +61,8 @@ export default class SoundFont {
   }
 
   /**
-   *
    * @param {File} file
+   * @returns {Promise<void>}
    */
   async loadSoundFontFromFile (file) {
     const arrayBuffer = await readFileAsArrayBuffer(file);
@@ -63,6 +73,7 @@ export default class SoundFont {
   /**
    *
    * @param {string} url
+   * @returns {Promise<void>}
    */
   async loadSoundFontFromURL (url) {
     const arrayBuffer = await fetchResourceAsArrayBuffer(url);
@@ -79,7 +90,7 @@ export default class SoundFont {
   get banks () {
     return Object.keys(this.synth.programSet).map(id => ({
       id,
-      name:  ('000' + parseInt(id, 10)).slice(-3)
+      name: ('000' + parseInt(id, 10)).slice(-3)
     }));
   }
 
@@ -94,12 +105,13 @@ export default class SoundFont {
 
     return Object.keys(programSet[this._bankIndex]).map(id => ({
       id,
-      name: ('000' + (parseInt(id) + 1)).slice(-3) + ':' + programSet[this._bankIndex][id]
+      name: ('000' + (parseInt(id, 10) + 1)).slice(-3) + ':' + programSet[this._bankIndex][id]
     }));
   }
 
   /**
    * @param {ArrayBuffer} arrayBuffer
+   * @returns {Promise<void>}
    */
   async bootSynth (arrayBuffer) {
     const input = new Uint8Array(arrayBuffer);
@@ -113,16 +125,12 @@ export default class SoundFont {
       this.synth.start();
 
       await waitForReference(this.synth.programSet);
-
-      console.log(this.synth);
-      console.log(this.banks);
-      console.log(this.programs);
     }
   }
 
   /**
-   *
    * @param {number} midiNumber
+   * @returns {void}
    */
   noteOn (midiNumber) {
     const volume = 127;
@@ -131,8 +139,8 @@ export default class SoundFont {
   }
 
   /**
-   *
    * @param {number} midiNumber
+   * @returns {void}
    */
   noteOff (midiNumber) {
     const volume = 127;
