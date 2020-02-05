@@ -1,28 +1,38 @@
+/** @typedef Options
+  * @prop {number} [decay]
+  * @prop {number} [delay]
+  * @prop {number} [filterFreq]
+  * @prop {number} [filterQ]
+  * @prop {BiquadFilterType} [filterType]
+  * @prop {number} [mix]
+  * @prop {boolean} [reverse]
+  * @prop {number} [time]
+ */
+
 export default class Reverb {
   /**
    * constructor
    * @param {AudioContext} ctx
-   * @param {{
-   *   decay: (number|undefined),
-   *   delay: (number|undefined),
-   *   filterFreq: (number|undefined),
-   *   filterQ: (number|undefined),
-   *   filterType: (BiquadFilterType|undefined),
-   *   mix: (number|undefined),
-   *   reverse: (boolean|undefined),
-   *   time: (number|undefined)
-   * }} options
+   * @param {Options} providedOptions
    */
-  constructor (ctx, options = {
-    decay: undefined,
-    delay: undefined,
-    filterFreq: undefined,
-    filterQ: undefined,
-    filterType: undefined,
-    mix: undefined,
-    reverse: undefined,
-    time: undefined
-  }) {
+  constructor (ctx, providedOptions) {
+
+    const defaultOptions = {
+      decay: undefined,
+      delay: undefined,
+      filterFreq: undefined,
+      filterQ: undefined,
+      filterType: undefined,
+      mix: undefined,
+      reverse: undefined,
+      time: undefined
+    };
+
+    const options = {
+      ...defaultOptions,
+      ...providedOptions
+    };
+
     /** @type {AudioContext} */
     this.ctx = ctx;
     /** @type {GainNode} */

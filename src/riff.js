@@ -1,3 +1,4 @@
+/* eslint-disable no-bitwise */
 /**
  * Riff Parser class
  * @private
@@ -14,15 +15,15 @@ export class Riff {
     /** @type {number} */
     this.length = optParams.length || input.length - this.ip;
     /** @type {Array.<RiffChunk>} */
-    this.chunkList;
+    this.chunkList = [];
     /** @type {number} */
     this.offset = this.ip;
     /** @type {boolean} */
     this.padding =
-      optParams.padding !== void 0 ? optParams.padding : true;
+      optParams.padding !== undefined ? optParams.padding : true;
     /** @type {boolean} */
     this.bigEndian =
-      optParams.bigEndian !== void 0 ? optParams.bigEndian : false;
+      optParams.bigEndian !== undefined ? optParams.bigEndian : false;
   }
 
   parse () {
@@ -72,7 +73,7 @@ export class Riff {
     /** @type {RiffChunk} */
     const chunk = this.chunkList[index];
 
-    if (chunk === void 0) {
+    if (chunk === undefined) {
       return null;
     }
 
@@ -106,3 +107,5 @@ export class RiffChunk {
     this.offset = offset;
   }
 }
+
+export default Riff;

@@ -2,6 +2,63 @@
 import * as RiffHelper from './riff.js';
 
 /**
+ * @typedef InstrumentGenerator
+ * @prop {Array.<Object>} startAddrsOffset
+ * @prop {Array.<Object>} endAddrsOffset
+ * @prop {Array.<Object>} startloopAddrsOffset
+ * @prop {Array.<Object>} endloopAddrsOffset
+ * @prop {Array.<Object>} startAddrsCoarseOffset
+ * @prop {Array.<Object>} modLfoToPitch
+ * @prop {Array.<Object>} vibLfoToPitch
+ * @prop {Array.<Object>} modEnvToPitch
+ * @prop {Array.<Object>} initialFilterFc
+ * @prop {Array.<Object>} initialFilterQ
+ * @prop {Array.<Object>} modLfoToFilterFc
+ * @prop {Array.<Object>} modEnvToFilterFc
+ * @prop {Array.<Object>} endAddrsCoarseOffset
+ * @prop {Array.<Object>} modLfoToVolume
+ * @prop {Array.<Object>} chorusEffectsSend
+ * @prop {Array.<Object>} reverbEffectsSend
+ * @prop {Array.<Object>} pan
+ * @prop {Array.<Object>} delayModLFO
+ * @prop {Array.<Object>} freqModLFO
+ * @prop {Array.<Object>} delayVibLFO
+ * @prop {Array.<Object>} freqVibLFO
+ * @prop {Array.<Object>} delayModEnv
+ * @prop {Array.<Object>} attackModEnv
+ * @prop {Array.<Object>} holdModEnv
+ * @prop {Array.<Object>} decayModEnv
+ * @prop {Array.<Object>} sustainModEnv
+ * @prop {Array.<Object>} releaseModEnv
+ * @prop {Array.<Object>} keynumToModEnvHold
+ * @prop {Array.<Object>} keynumToModEnvDecay
+ * @prop {Array.<Object>} delayVolEnv
+ * @prop {Array.<Object>} attackVolEnv
+ * @prop {Array.<Object>} holdVolEnv
+ * @prop {Array.<Object>} decayVolEnv
+ * @prop {Array.<Object>} sustainVolEnv
+ * @prop {Array.<Object>} releaseVolEnv
+ * @prop {Array.<Object>} keynumToVolEnvHold
+ * @prop {Array.<Object>} keynumToVolEnvDecay
+ * @prop {Array.<Object>} instrument
+ * @prop {Array.<Object>} keyRange
+ * @prop {Array.<Object>} velRange
+ * @prop {Array.<Object>} startloopAddrsCoarseOffset
+ * @prop {Array.<Object>} keynum
+ * @prop {Array.<Object>} velocity
+ * @prop {Array.<Object>}initialAttenuation
+ * @prop {Array.<Object>} endloopAddrsCoarseOffset
+ * @prop {Array.<Object>} coarseTune
+ * @prop {Array.<Object>} fineTune
+ * @prop {Array.<Object>} sampleID
+ * @prop {Array.<Object>} sampleModes
+ * @prop {Array.<Object>} scaleTuning
+ * @prop {Array.<Object>} exclusiveClass
+ * @prop {Array.<Object>} overridingRootKey
+ * @prop {Array.<Object>} endOper
+ */
+
+/**
  * SoundFont Parser Class
  */
 export class Parser {
@@ -720,7 +777,7 @@ export class Parser {
     let bagIndexEnd;
     /** @type {Array.<Object>} */
     let zoneInfo;
-    /** @type {{generator: Object, generatorInfo: Array.<Object>}} */
+    /** @type {{generator: InstrumentGenerator, generatorInfo: Array.<Object>}} */
     let instrumentGenerator;
     /** @type {{modulator: Object, modulatorInfo: Array.<Object>}} */
     let instrumentModulator;
@@ -779,7 +836,7 @@ export class Parser {
     let zoneInfo;
     /** @type {number} */
     let instrument;
-    /** @type {{generator: Object, generatorInfo: Array.<Object>}} */
+    /** @type {{generator: InstrumentGenerator, generatorInfo: Array.<Object>}} */
     let presetGenerator;
     /** @type {{modulator: Object, modulatorInfo: Array.<Object>}} */
     let presetModulator;
@@ -872,7 +929,7 @@ export class Parser {
   /**
    * @param {Array.<Object>} zone
    * @param {number} index
-   * @return {{generator: Object, generatorInfo: Array.<Object>}}
+   * @return {{generator: InstrumentGenerator, generatorInfo: Array.<Object>}}
    * @private
    */
   createPresetGenerator_ (zone, index) {

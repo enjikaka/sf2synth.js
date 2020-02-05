@@ -1,3 +1,48 @@
+/* eslint-disable no-bitwise */
+
+/** @typedef Instrument
+ * @prop {number} channel
+ * @prop {number} key
+ * @prop {Uint8Array} sample
+ * @prop {number} basePlaybackRate
+ * @prop {number} start
+ * @prop {number} end
+ * @prop {number} pan
+ * @prop {number} scaleTuning
+ * @prop {number} loopStart
+ * @prop {number} loopEnd
+ * @prop {number} volume
+ * @prop {number} panpot
+ * @prop {number} sampleModes
+ * @prop {boolean} mute
+ * @prop {number} initialFilterQ
+ * @prop {number} initialFilterFc
+ * @prop {number} initialAttenuation
+ * @prop {number} modEnvToFilterFc
+ * @prop {number} modDelay
+ * @prop {number} modAttack
+ * @prop {number} modHold
+ * @prop {number} modDecay
+ * @prop {number} modSustain
+ * @prop {number} modRelease
+ * @prop {number} volDelay
+ * @prop {number} volDecay
+ * @prop {number} volSustain
+ * @prop {number} volAttack
+ * @prop {number} volHold
+ * @prop {number} releaseTime
+ * @prop {number} volRelease
+ * @prop {number} velocity
+ * @prop {number} sampleRate
+ * @prop {number} pitchBend
+ * @prop {number} pitchBendSensitivity
+ * @prop {number} modEnvToPitch
+ * @prop {number} expression
+ * @prop {number} cutOffFrequency
+ * @prop {number} hermonicContent
+ * @prop {import('./reverb.js').default} reverb
+ */
+
 /**
  * SynthesizerNote Class
  * @private
@@ -6,33 +51,13 @@ export class SynthesizerNote {
   /**
    * @param {AudioContext} ctx
    * @param {AudioNode} destination
-   * @param {{
-   *   channel: number,
-   *   key: number,
-   *   sample: Uint8Array,
-   *   basePlaybackRate: number,
-   *   loopStart: number,
-   *   loopEnd: number,
-   *   volume: number,
-   *   panpot: number
-   * }} instrument
+   * @param {Instrument} instrument
    */
   constructor (ctx, destination, instrument) {
     /** @type {AudioContext} */
     this.ctx = ctx;
     /** @type {AudioNode} */
     this.destination = destination;
-    /** @type {{
-     *   channel: number,
-     *   key: number,
-     *   sample: Uint8Array,
-     *   basePlaybackRate: number,
-     *   loopStart: number,
-     *   loopEnd: number,
-     *   volume: number,
-     *   panpot: number
-     * }}
-     */
     this.instrument = instrument;
     /** @type {number} */
     this.channel = instrument.channel;
@@ -40,7 +65,7 @@ export class SynthesizerNote {
     this.key = instrument.key;
     /** @type {number} */
     this.velocity = instrument.velocity;
-    /** @type {Int16Array} */
+    /** @type {Uint8Array} */
     this.buffer = instrument.sample;
     /** @type {number} */
     this.playbackRate = instrument.basePlaybackRate;
@@ -67,7 +92,7 @@ export class SynthesizerNote {
     /** @type {number} */
     this.hermonicContent = instrument.hermonicContent;
 
-    /** @type {Reverb} */
+    /** @type {import('./reverb.js').default} */
     this.reverb = instrument.reverb;
 
     // state
@@ -83,10 +108,10 @@ export class SynthesizerNote {
     // ---------------------------------------------------------------------------
 
     /** @type {AudioBuffer} */
-    this.audioBuffer;
+    this.audioBuffer = null;
     /** @type {AudioBufferSourceNode} */
     this.bufferSource = ctx.createBufferSource();
-    /** @type {StereoPannerNode} */
+    /** @type {PannerNode} */
     this.panner = ctx.createPanner();
     /** @type {GainNode} */
     this.outputGainNode = ctx.createGain();
@@ -98,23 +123,12 @@ export class SynthesizerNote {
     this.modulator = ctx.createBiquadFilter();
   }
 
-  /**
-   */
   noteOn () {
     /** @type {AudioContext} */
     const ctx = this.ctx;
-    /** @type {{
-     *   channel: number,
-     *   key: number,
-     *   sample: Uint8Array,
-     *   basePlaybackRate: number,
-     *   loopStart: number,
-     *   loopEnd: number,
-     *   volume: number,
-     *   panpot: number
-     * }} */
+
     const instrument = this.instrument;
-    // console.log(instrument);
+
     /** @type {number} */
     const now = this.ctx.currentTime || 0;
     /** @type {number} */
@@ -141,12 +155,14 @@ export class SynthesizerNote {
     const startTime = instrument.start / this.sampleRate;
     // TODO: ドラムパートのPanが変化した場合、その計算をしなければならない
     // http://cpansearch.perl.org/src/PJB/MIDI-SoundFont-1.08/doc/sfspec21.html#8.4.6
-    /** @type {number} */
-    const pan = instrument.pan !== void 0 ? instrument.pan : this.panpot;
+    const pan = instrument.pan !== undefined ? instrument.pan : this.panpot;
 
     const sample = this.buffer.subarray(0, this.buffer.length + instrument.end);
-    /** @type {AudioBuffer} */
-    const buffer = this.audioBuffer = ctx.createBuffer(1, sample.length, this.sampleRate);
+
+    this.audioBuffer = ctx.createBuffer(1, sample.length, this.sampleRate);
+
+    const { audioBuffer: buffer } = this;
+
     /** @type {Float32Array} */
     const channelData = buffer.getChannelData(0);
 
@@ -157,6 +173,7 @@ export class SynthesizerNote {
     const bufferSource = this.bufferSource;
 
     bufferSource.buffer = buffer;
+    // @ts-ignore
     bufferSource.loop = instrument.sampleModes | 0 || 0;
     bufferSource.loopStart = loopStart;
     bufferSource.loopEnd = loopEnd;
@@ -170,7 +187,7 @@ export class SynthesizerNote {
     this.expressionGainNode.gain.value = this.expression / 127;
 
     // panpot
-    /** @type {StereoPannerNode} */
+    /** @type {PannerNode} */
     const panner = this.panner;
 
     panner.panningModel = 'equalpower';
@@ -193,7 +210,6 @@ export class SynthesizerNote {
     }
 
     // volume envelope
-    /** @type {AudioNode} */
     const outputGain = output.gain;
 
     outputGain.setValueAtTime(0, now);
@@ -219,7 +235,7 @@ export class SynthesizerNote {
     modulator.frequency.setTargetAtTime(baseFreq / 127, this.ctx.currentTime, 0.5);
     modulator.frequency.setValueAtTime(baseFreq, now);
     modulator.frequency.setValueAtTime(baseFreq, modDelay);
-    modulator.frequency.setTargetAtTime(peekFreq, modDelay, parseFloat(instrument.modAttack + 1)); // For FireFox fix
+    modulator.frequency.setTargetAtTime(peekFreq, modDelay, parseFloat(String(instrument.modAttack + 1))); // For FireFox fix
     modulator.frequency.setValueAtTime(peekFreq, modHold);
     modulator.frequency.linearRampToValueAtTime(sustainFreq, modDecay);
 
@@ -246,8 +262,6 @@ export class SynthesizerNote {
     return 2 ** ((val - 6900) / 1200) * 440;
   }
 
-  /**
-   */
   noteOff () {
     this.noteOffState = true;
   }
@@ -263,16 +277,6 @@ export class SynthesizerNote {
    * @return {void}
    */
   release () {
-    /** @type {{
-     *   channel: number,
-     *   key: number,
-     *   sample: Uint8Array,
-     *   basePlaybackRate: number,
-     *   loopStart: number,
-     *   loopEnd: number,
-     *   volume: number,
-     *   panpot: number
-     * }} */
     const instrument = this.instrument;
     /** @type {AudioBufferSourceNode} */
     const bufferSource = this.bufferSource;
@@ -357,26 +361,21 @@ export class SynthesizerNote {
       bufferSource.playbackRate.cancelScheduledValues(0);
       bufferSource.playbackRate.setValueAtTime(bufferSource.playbackRate.value, now);
       bufferSource.playbackRate.linearRampToValueAtTime(this.computedPlaybackRate, modEndTime);
+      break;
     default:
       bufferSource.loop = false;
       break;
     }
   }
 
-  /**
-   */
   connect () {
     this.reverb.connect(this.outputGainNode).connect(this.destination);
   }
 
-  /**
-   */
   disconnect () {
     this.outputGainNode.disconnect(0);
   }
 
-  /**
-   */
   schedulePlaybackRate () {
     const playbackRate = this.bufferSource.playbackRate;
     /** @type {number} */
@@ -391,8 +390,7 @@ export class SynthesizerNote {
     const modDecay = modAttack + instrument.modDecay;
     /** @type {number} */
     const peekPitch = computed *
-      1.0594630943592953 // Math.pow(2, 1 / 12)
-      **
+      Math.pow(2, 1 / 12) **
       (this.modEnvToPitch * this.instrument.scaleTuning);
 
     playbackRate.cancelScheduledValues(0);
@@ -403,6 +401,7 @@ export class SynthesizerNote {
 
   /**
    * @param {number} expression
+   * @returns {void}
    */
   updateExpression (expression) {
     this.expressionGainNode.gain.value = (this.expression = expression) / 127;
@@ -410,11 +409,11 @@ export class SynthesizerNote {
 
   /**
    * @param {number} pitchBend
+   * @returns {void}
    */
   updatePitchBend (pitchBend) {
     this.computedPlaybackRate = this.playbackRate * (
-      1.0594630943592953 // Math.pow(2, 1 / 12)
-      **
+      Math.pow(2, 1 / 12) **
       ((pitchBend / (pitchBend < 0 ? 8192 : 8191)) *
         this.pitchBendSensitivity *
         this.instrument.scaleTuning));
