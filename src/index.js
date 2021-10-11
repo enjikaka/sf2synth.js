@@ -145,6 +145,6 @@ export default class SoundFont {
    * @returns {void}
    */
   noteOff (midiNumber, velocity = 127, channel) {
-    this.synth.noteOff(channel || this._channel || 0, midiNumber, velocity);
+    this.synth.noteOff(channel || this._channel || 0, midiNumber, velocity);
   }
 }
