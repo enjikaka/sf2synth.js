@@ -130,21 +130,21 @@ export default class SoundFont {
 
   /**
    * @param {number} midiNumber
+   * @param {number} velocity
+   * @param {number} channel
    * @returns {void}
    */
-  noteOn (midiNumber) {
-    const volume = 127;
-
-    this.synth.noteOn(this._channel, midiNumber, volume);
+  noteOn (midiNumber, velocity = 127, channel = 0) {
+    this.synth.noteOn(this._channel || channel, midiNumber, velocity);
   }
 
   /**
    * @param {number} midiNumber
+   * @param {number} velocity
+   * @param {number} channel
    * @returns {void}
    */
-  noteOff (midiNumber) {
-    const volume = 127;
-
-    this.synth.noteOff(this._channel, midiNumber, volume);
+  noteOff (midiNumber, velocity = 127, channel = 0) {
+    this.synth.noteOff(this._channel || channel, midiNumber, velocity);
   }
 }
