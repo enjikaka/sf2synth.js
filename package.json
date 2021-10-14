@@ -3,22 +3,18 @@
   "version": "0.0.4",
   "description": "SoundFont2 Player",
   "type": "module",
-  "scripts": {
-    "start": "http-server ./ -p 8080",
-    "build": "npx @pika/pack"
+  "module": "./index.js",
+  "exports": {
+    "import": "./index.js"
   },
-  "@pika/pack": {
-    "pipeline": [
-      [
-        "@pika/plugin-standard-pkg"
-      ],
-      [
-        "@pika/plugin-build-web"
-      ],
-      [
-        "@pika/plugin-bundle-web"
-      ]
-    ]
+  "scripts": {
+    "server": "http-server ./ -p 8080",
+    "esbuild": "npx esbuild src/index.js --bundle --sourcemap --minify --platform=browser --format=esm --outfile=pkg/index.js",
+    "esbuild:watch": "npx esbuild src/index.js --bundle --platform=browser --format=esm --watch --outfile=pkg/index.js",
+    "dev": "npx npm-run-all --parallel esbuild:watch server",
+    "build": "rm -rf pkg/ && mkdir pkg && npm run esbuild",
+    "prepublish": "npm version patch && cp package.json pkg/package.json",
+    "release": "npm run build && npm publish ./pkg"
   },
   "repository": {
     "type": "git",
