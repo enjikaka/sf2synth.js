@@ -13,8 +13,7 @@
     "esbuild:watch": "npx esbuild src/index.js --bundle --platform=browser --format=esm --watch --outfile=pkg/index.js",
     "dev": "npx npm-run-all --parallel esbuild:watch server",
     "build": "rm -rf pkg/ && mkdir pkg && npm run esbuild",
-    "prepublish": "npm version patch && cp package.json pkg/package.json",
-    "release": "npm run build && npm publish ./pkg"
+    "release": "npm version patch && cp package.json ./pkg/package.json && npm publish ./pkg"
   },
   "repository": {
     "type": "git",
