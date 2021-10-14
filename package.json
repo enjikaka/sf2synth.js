@@ -1,6 +1,6 @@
 {
   "name": "sf2-player",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "SoundFont2 Player",
   "type": "module",
   "module": "./index.js",
